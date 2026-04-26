@@ -218,10 +218,10 @@
       animation: drawStroke 0.3s ease-out 1.35s forwards;
     }
 
-    /* Hex edges */
+    /* Hex edges — dasharray must be >= longest edge (36px for vertical edges) */
     .hex-edge {
-      stroke-dasharray: 34;
-      stroke-dashoffset: 34;
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
       animation: drawStroke 0.12s ease-out forwards;
     }
     .hex-edge:nth-child(1) { animation-delay: 1.40s; }
@@ -233,8 +233,8 @@
 
     /* Orange accent hex edges */
     .hex-accent {
-      stroke-dasharray: 34;
-      stroke-dashoffset: 34;
+      stroke-dasharray: 40;
+      stroke-dashoffset: 40;
       animation: drawStroke 0.25s ease-out forwards;
     }
     .hex-accent:nth-child(1) { animation-delay: 1.70s; }
@@ -242,7 +242,8 @@
 
     /* Center dot */
     .center-dot {
-      transform-origin: 100px 100px;
+      transform-box: fill-box;
+      transform-origin: center;
       transform: scale(0);
       animation: scaleIn 0.2s ease-out 1.9s forwards;
     }
@@ -463,6 +464,9 @@
       background: var(--mc-border);
       width: 100%;
     }
+
+    /* Offset anchor targets so fixed nav doesn't cover headings */
+    #services, #about, #contact { scroll-margin-top: 64px; }
 
     /* ─── CONTACT ────────────────────────────────────────────── */
     #contact {
@@ -1030,6 +1034,25 @@
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
+
+      // Client-side validation (novalidate disables native browser checks)
+      var name    = form.querySelector('#name').value.trim();
+      var email   = form.querySelector('#email').value.trim();
+      var message = form.querySelector('#message').value.trim();
+      if (!name || !email || !message) {
+        alert('Please fill in your name, email, and message.');
+        return;
+      }
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      if (!emailOk) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      var btn = form.querySelector('.btn-submit');
+      btn.disabled = true;
+      btn.textContent = 'Sending…';
+
       var data = new FormData(form);
       fetch(form.action, {
         method: 'POST',
@@ -1041,15 +1064,20 @@
           form.style.display = 'none';
           success.style.display = 'block';
         } else {
-          res.json().then(function (json) {
-            if (json.errors) {
-              alert(json.errors.map(function(e) { return e.message; }).join(', '));
-            }
+          return res.json().then(function (json) {
+            var msg = (json.errors && json.errors.length)
+              ? json.errors.map(function (err) { return err.message; }).join(', ')
+              : 'Submission failed. Please try again.';
+            alert(msg);
+            btn.disabled = false;
+            btn.textContent = 'Send inquiry';
           });
         }
       })
       .catch(function () {
-        alert('Network error — please try again or email us directly.');
+        alert('Network error — please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Send inquiry';
       });
     });
   })();
