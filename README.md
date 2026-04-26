@@ -22,11 +22,20 @@ npx serve .
 
 ## Before going live
 
-1. **Formspree** — Create a free account at [formspree.io](https://formspree.io), create a form, and replace `REPLACE_WITH_YOUR_FORMSPREE_ID` in `index.html` with your real form ID (the 8-character code in the endpoint URL).
+1. **favicon.ico** — The SVG favicon (`favicon.svg`) works in all modern browsers. For older browser fallback, generate a `favicon.ico`:
+   ```bash
+   # Option A — npx (no install)
+   npx png-to-ico favicon-32.png --output favicon.ico
 
-2. **GitHub Pages** — Enable Pages in repo Settings → Pages → Source: **GitHub Actions**. The workflow in `.github/workflows/deploy.yml` runs on every push to `main`.
+   # Option B — upload favicon.svg to https://favicon.io and download the .ico
+   ```
+   Place `favicon.ico` in the project root and push.
 
-3. **Custom domain DNS** — In Cloudflare (or your DNS provider), add:
+2. **Formspree** — Create a free account at [formspree.io](https://formspree.io), create a form, and replace `REPLACE_WITH_YOUR_FORMSPREE_ID` in `index.html` with your real form ID (the 8-character code in the endpoint URL).
+
+3. **GitHub Pages** — Enable Pages in repo Settings → Pages → Source: **GitHub Actions**. The workflow in `.github/workflows/deploy.yml` runs on every push to `main`.
+
+4. **Custom domain DNS** — In Cloudflare (or your DNS provider), add:
 
    | Type  | Name | Value             |
    |-------|------|-------------------|
@@ -36,7 +45,7 @@ npx serve .
    | A     | @    | 185.199.111.153   |
    | CNAME | www  | amjusti.github.io |
 
-4. **Custom domain in GitHub** — Repo Settings → Pages → Custom domain → enter `maincoreprecision.com` → Save. Check "Enforce HTTPS" once DNS propagates (usually < 1 hour).
+5. **Custom domain in GitHub** — Repo Settings → Pages → Custom domain → enter `maincoreprecision.com` → Save. Check "Enforce HTTPS" once DNS propagates (usually < 1 hour).
 
 ---
 
@@ -57,7 +66,11 @@ The GitHub Actions workflow deploys automatically. Check the **Actions** tab for
 ```
 /
 ├── index.html                  # Entire site (CSS + JS inline)
+├── favicon.svg                 # SVG favicon (all modern browsers)
+├── favicon.ico                 # .ico fallback (generate manually — see above)
 ├── CNAME                       # Custom domain for GitHub Pages
+├── sitemap.xml
+├── robots.txt
 ├── .github/
 │   └── workflows/
 │       └── deploy.yml          # GitHub Pages deploy workflow
